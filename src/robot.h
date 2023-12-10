@@ -1,6 +1,7 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#include <QString>
 #include <QGroupBox>
 #include <QPushButton>
 #include <QCheckBox>

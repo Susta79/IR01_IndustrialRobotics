@@ -35,6 +35,8 @@ add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM}
     src/kinematic.h
     src/tcpclient.cpp
     src/tcpclient.h
+    src/trajectory.cpp
+    src/trajectory.h
     include/IR01/error_def.h
     ${APP_ICON_RESOURCE_WINDOWS}
 )

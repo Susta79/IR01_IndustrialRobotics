@@ -16,6 +16,10 @@ Cinematica
 
 
 Alla fine devo dare la scelta del tipo di traiettoria (profilo di movimento):
-- Curca a S (curva a 7 segmenti).
+- Curva a S (curva a 7 segmenti).
 - Bezier.
 - Ottimizzato.
+
+2023.12.10: Ho copiato la classe Pose e l'ho rinominata Trajectory. Lo scopo era quello di copiare il codice della funzione Line, che avevo già scritto, all'interno di questo progetto.
+Devo completare questa classe con le funzioni necessarie per il calcolo delle traiettorie.
+Nella funzione Line ho implementato la Curva a S, ma deve essere ancora finita. Devo per esempio analizzare i casi in cui alcune parti della curva a 7 segmenti si eliminano.

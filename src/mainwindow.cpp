@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
    setCentralWidget(windowGen);
 
-   this->setWindowTitle(tr("ARC - V01"));
+   this->setWindowTitle(tr("IR01_IndustrialRobotics"));
    this->move(10, 10);
 
    connect(pbKinematic, &QPushButton::clicked, this, &MainWindow::pbKinematic_clicked);
