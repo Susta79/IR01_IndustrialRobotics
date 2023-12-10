@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project ("ARC")
+project ("IR01_IndustrialRobotics")
 
 message (STATUS "[${PROJECT_NAME}] Processing ${CMAKE_CURRENT_LIST_FILE}")
 
@@ -35,7 +35,7 @@ add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM}
     src/kinematic.h
     src/tcpclient.cpp
     src/tcpclient.h
-    include/ARC/error_def.h
+    include/IR01/error_def.h
     ${APP_ICON_RESOURCE_WINDOWS}
 )
 

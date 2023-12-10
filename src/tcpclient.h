@@ -1,7 +1,7 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
-#include "error_def.h"
+#include <IR01/error_def.h>
 #include "joint.h"
 
 #include <QObject>
