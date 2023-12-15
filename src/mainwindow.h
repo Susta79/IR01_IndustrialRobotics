@@ -23,12 +23,14 @@ public:
 
 private slots:
     void pbKinematic_clicked();
+    void tmrMain_timeout();
 
 private:
     Kinematic* pKinematic;
     Robot* pRobot;
     TcpClient* pTcpClient;
     QPushButton *pbKinematic;
+    QTimer* tmrMain;
 };
 
 #endif // MAINWINDOW_H

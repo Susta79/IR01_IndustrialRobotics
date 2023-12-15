@@ -76,6 +76,7 @@ public:
     // 
     ARCCode_t IK(Affine3d p, Robot::FrontBack fb, Robot::UpDown ud, Robot::PosNeg pn, Array<double, 6, 1>& joint);
     ARCCode_t IK_2(Affine3d p, Array<double, 6, 1>& joint);
+    ARCCode_t IK_3(Affine3d p, Robot::FrontBack fb, Robot::UpDown ud, Robot::PosNeg pn, Array<double, 6, 1>& joint);
     //Joint IK(Affine3d p, Affine3d UT, Affine3d UF, Joint jAct, FrontBack FB, UpDown UD, PositiveNegative PN);
 };
 
