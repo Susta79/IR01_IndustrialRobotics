@@ -53,42 +53,42 @@ void Pose::Init(){
     this->dsbX->setSingleStep(1.0);
     this->dsbX->setSuffix("mm");
     this->dsbX->setValue(0.0);
-    this->dsbX->setDecimals(1);
+    this->dsbX->setDecimals(2);
 
     this->dsbY = new QDoubleSpinBox;
     this->dsbY->setRange(-9999.0, 9999.0);
     this->dsbY->setSingleStep(1.0);
     this->dsbY->setSuffix("mm");
     this->dsbY->setValue(0.0);
-    this->dsbY->setDecimals(1);
+    this->dsbY->setDecimals(2);
 
     this->dsbZ = new QDoubleSpinBox;
     this->dsbZ->setRange(-9999.0, 9999.0);
     this->dsbZ->setSingleStep(1.0);
     this->dsbZ->setSuffix("mm");
     this->dsbZ->setValue(0.0);
-    this->dsbZ->setDecimals(1);
+    this->dsbZ->setDecimals(2);
 
     this->dsbA = new QDoubleSpinBox;
     this->dsbA->setRange(-360.0, 360.0);
     this->dsbA->setSingleStep(1.0);
     this->dsbA->setSuffix("°");
     this->dsbA->setValue(0.0);
-    this->dsbA->setDecimals(1);
+    this->dsbA->setDecimals(3);
 
     this->dsbB = new QDoubleSpinBox;
     this->dsbB->setRange(-360.0, 360.0);
     this->dsbB->setSingleStep(1.0);
     this->dsbB->setSuffix("°");
     this->dsbB->setValue(0.0);
-    this->dsbB->setDecimals(1);
+    this->dsbB->setDecimals(3);
 
     this->dsbC = new QDoubleSpinBox;
     this->dsbC->setRange(-360.0, 360.0);
     this->dsbC->setSingleStep(1.0);
     this->dsbC->setSuffix("°");
     this->dsbC->setValue(0.0);
-    this->dsbC->setDecimals(1);
+    this->dsbC->setDecimals(3);
 
     this->gbPose = new QGroupBox("Pose");
     QFormLayout *layoutJoints = new QFormLayout;
@@ -103,12 +103,12 @@ void Pose::Init(){
 
 // pose
 Affine3d Pose::get_pose(){
+    Matrix3d rot;
     Affine3d p = Eigen::Affine3d::Identity();
     p.translation() = Eigen::Vector3d(this->dsbX->value(), this->dsbY->value(), this->dsbZ->value());
-    Matrix3d rot;
-    rot = AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitZ())
-        * AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY())
-        * AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitX());
+    rot = AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitZ()) *
+        AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY()) *
+        AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitX());
     p.linear() = rot;
     return p;
 }
