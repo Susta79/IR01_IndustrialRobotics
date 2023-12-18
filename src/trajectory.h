@@ -1,67 +1,49 @@
 #ifndef TRAJECTORY_H
 #define TRAJECTORY_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+//#define _USE_MATH_DEFINES
+//#include <math.h>
 
-#include <QWidget>
+//#include <QWidget>
 #include <QGroupBox>
 #include <QDoubleSpinBox>
+#include <QPushButton>
+
 #include <Eigen\Geometry>
 
-using namespace Eigen;
+#include "pose.h"
 
-class Trajectory
+//using namespace Eigen;
+
+class Trajectory : public QObject
 {
 private:
-    Quaterniond q = Quaterniond::Identity(); 
-    // Group Pose
-    QDoubleSpinBox *dsbX;
-    QDoubleSpinBox *dsbY;
-    QDoubleSpinBox *dsbZ;
-    QDoubleSpinBox *dsbA;
-    QDoubleSpinBox *dsbB;
-    QDoubleSpinBox *dsbC;
+    Q_OBJECT
+    
+    QPushButton *pbLinear;
+    QPushButton *pbJoint;
+    
+    Pose* pFromPose;
+    Pose* pToPose;
+    
+    QDoubleSpinBox *dsbMaxSpeed;
+    QDoubleSpinBox *dsbMaxAccDec;
+    QDoubleSpinBox *dsbMaxJerk;
 
-    void Init();
+private slots:
+    void pbLinear_released();
+    void pbJoint_released();
 
-    void Line();
+private:
+
+    void Linear();
+    void Joint();
 
 public:
-    QGroupBox *gbPose;
+    QGroupBox *gbPTP;
 
     Trajectory();
-    Trajectory(Affine3d);
     ~Trajectory();
-
-    // pose
-    Affine3d get_pose();
-    void set_pose(Affine3d);
-
-    // x
-    double get_x();
-    void set_x(double val);
-
-    // y
-    double get_y();
-    void set_y(double val);
-
-    // z
-    double get_z();
-    void set_z(double val);
-
-    // a
-    double get_a();
-    void set_a(double val);
-
-    // b
-    double get_b();
-    void set_b(double val);
-
-    // c
-    double get_c();
-    void set_c(double val);
-
 };
 
 #endif // TRAJECTORY_H

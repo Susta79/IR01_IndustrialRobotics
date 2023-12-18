@@ -36,9 +36,6 @@ private:
 
     Link* pLink;
     Pose* pPose;
-    //Brand brand;
-    //string model;
-    //string brand_string();
 
 private slots:
     void pbFK_released();
@@ -59,16 +56,9 @@ public:
     QGroupBox *gbGroup;
 
     Robot(QString name);
-    //Robot(Brand b, string model);
     ~Robot();
-    //void setdimensions(double a1z, double a2x, double a2z, double a3z, double a4x, double a4z, double a5x, double a6x);
-    //void setdimensionsIR(void);
-    //void setdimensionsABB(void);
-    //void setdimensionsKUKA(void);
-    //void printAffine3d(Affine3d p);
     Affine3d FK(Array<double, 6, 1>);
     // IK: return the joint value 
-    //Array<double, 6, 1> IK(Affine3d p, Array<double, 6, 1> joint_act);
     // Inverse kinematics IK: from pose to joint values.
     // paramenters:
     //      pose: desired robot pose
@@ -77,7 +67,6 @@ public:
     ARCCode_t IK(Affine3d p, Robot::FrontBack fb, Robot::UpDown ud, Robot::PosNeg pn, Array<double, 6, 1>& joint);
     ARCCode_t IK_2(Affine3d p, Array<double, 6, 1>& joint);
     ARCCode_t IK_3(Affine3d p, Robot::FrontBack fb, Robot::UpDown ud, Robot::PosNeg pn, Array<double, 6, 1>& joint);
-    //Joint IK(Affine3d p, Affine3d UT, Affine3d UF, Joint jAct, FrontBack FB, UpDown UD, PositiveNegative PN);
 };
 
 #endif // ROBOT_H

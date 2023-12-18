@@ -67,11 +67,11 @@ Robot::Robot(QString n)
     gbPosNeg->setLayout(vboxPosNeg);
 
     // Group Main
-    this->gbGroup = new QGroupBox("Robot");
+    this->gbGroup = new QGroupBox(this->name);
     QHBoxLayout *layoutGroup = new QHBoxLayout();
     layoutGroup->addWidget(pJoint->gbJoints);
 
-    QGroupBox *gbButtons = new QGroupBox();
+    QGroupBox *gbButtons = new QGroupBox("Kinematic");
     QVBoxLayout *vboxButtons = new QVBoxLayout;
     vboxButtons->addWidget(pbFK);
     vboxButtons->addWidget(pbIK);

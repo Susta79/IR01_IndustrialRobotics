@@ -10,6 +10,7 @@
 #define VERSION "1.1.0"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+   this->pTrajectory = new Trajectory();
    this->pKinematic = new Kinematic(this);
    this->pRobot = new Robot("Robot1");
    this->pTcpClient = new TcpClient();
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
    vBoxLayout->addWidget(this->pRobot->gbGroup);
    vBoxLayout->addWidget(this->pbKinematic);
    vBoxLayout->addWidget(this->pTcpClient->gbGroup);
+   vBoxLayout->addWidget(this->pTrajectory->gbPTP);
 
    QWidget *windowMS = new QWidget();
    windowMS->setLayout(vBoxLayout);

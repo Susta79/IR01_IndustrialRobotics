@@ -4,6 +4,7 @@
 #include "robot.h"
 #include "tcpclient.h"
 #include "kinematic.h"
+#include "trajectory.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -26,6 +27,7 @@ private slots:
     void tmrMain_timeout();
 
 private:
+    Trajectory* pTrajectory;
     Kinematic* pKinematic;
     Robot* pRobot;
     TcpClient* pTcpClient;
