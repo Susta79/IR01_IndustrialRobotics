@@ -1,27 +1,16 @@
 #ifndef TRAJECTORY_H
 #define TRAJECTORY_H
 
-//#define _USE_MATH_DEFINES
-//#include <math.h>
-
-//#include <QWidget>
 #include <QGroupBox>
 #include <QDoubleSpinBox>
 #include <QPushButton>
 
-#include <Eigen\Geometry>
-
 #include "pose.h"
-
-//using namespace Eigen;
 
 class Trajectory : public QObject
 {
 private:
     Q_OBJECT
-    
-    QPushButton *pbLinear;
-    QPushButton *pbJoint;
     
     Pose* pFromPose;
     Pose* pToPose;
@@ -30,6 +19,9 @@ private:
     QDoubleSpinBox *dsbMaxAccDec;
     QDoubleSpinBox *dsbMaxJerk;
 
+    QPushButton *pbLinear;
+    QPushButton *pbJoint;
+    
 private slots:
     void pbLinear_released();
     void pbJoint_released();
@@ -40,7 +32,7 @@ private:
     void Joint();
 
 public:
-    QGroupBox *gbPTP;
+    QGroupBox *gbGroup;
 
     Trajectory();
     ~Trajectory();

@@ -31,6 +31,8 @@ add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM}
     src/link.h
     src/pose.cpp
     src/pose.h
+    src/pose_conf.cpp
+    src/pose_conf.h
     src/kinematic.cpp
     src/kinematic.h
     src/tcpclient.cpp

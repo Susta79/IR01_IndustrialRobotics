@@ -1,16 +1,14 @@
 #include "trajectory.h"
 
-//#include <QWidget>
-
 #include <QGroupBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
-//#include <QLabel>
+#include <QLabel>
 #include <Eigen/Dense>
 
 Trajectory::Trajectory(){
-   this->pFromPose = new Pose();
-   this->pToPose = new Pose();
+   this->pFromPose = new Pose("From");
+   this->pToPose = new Pose("To");
 
    this->dsbMaxSpeed = new QDoubleSpinBox;
    this->dsbMaxSpeed->setRange(0, 10000);
@@ -36,26 +34,67 @@ Trajectory::Trajectory(){
    this->pbLinear = new QPushButton("Linear");
    this->pbJoint = new QPushButton("Joint");
 
+   QHBoxLayout *layoutPose = new QHBoxLayout();
+   layoutPose->addWidget(pFromPose->gbGroup);
+   layoutPose->addWidget(pToPose->gbGroup);
+
+   QWidget *widgetPose = new QWidget();
+   widgetPose->setLayout(layoutPose);
+
+   QFormLayout *layoutSettings = new QFormLayout();
+   layoutSettings->addRow(new QLabel("Max speed:"), dsbMaxSpeed);
+   layoutSettings->addRow(new QLabel("Max acc:"), dsbMaxAccDec);
+   layoutSettings->addRow(new QLabel("Max jerk:"), dsbMaxJerk);
+   layoutSettings->addRow(new QLabel(""), pbLinear);
+   layoutSettings->addRow(new QLabel(""), pbJoint);
+
+   QWidget *widgetSettings = new QWidget();
+   widgetSettings->setLayout(layoutSettings);
+
+   QHBoxLayout *hBoxLayout = new QHBoxLayout();
+   hBoxLayout->addWidget(widgetPose);
+   hBoxLayout->addWidget(widgetSettings);
+
    // Group Main
-   this->gbPTP = new QGroupBox("PTP");
-   QHBoxLayout *layoutGroup = new QHBoxLayout();
-   layoutGroup->addWidget(pFromPose->gbPose);
-   layoutGroup->addWidget(pToPose->gbPose);
-   layoutGroup->addWidget(dsbMaxSpeed);
-   layoutGroup->addWidget(dsbMaxAccDec);
-   layoutGroup->addWidget(dsbMaxJerk);
-   layoutGroup->addWidget(pbLinear);
-   layoutGroup->addWidget(pbJoint);
-   gbPTP->setLayout(layoutGroup);
+   this->gbGroup = new QGroupBox("PTP");
+   gbGroup->setLayout(hBoxLayout);
 
    connect(pbLinear, &QPushButton::released, this, &Trajectory::pbLinear_released);
    connect(pbJoint, &QPushButton::released, this, &Trajectory::pbJoint_released);
 }
 
 Trajectory::~Trajectory(){
+    if (pFromPose) {
+        delete pFromPose;
+        pFromPose = nullptr;
+    }
     if (pToPose) {
         delete pToPose;
         pToPose = nullptr;
+    }
+    if (dsbMaxSpeed) {
+        delete dsbMaxSpeed;
+        dsbMaxSpeed = nullptr;
+    }
+    if (dsbMaxAccDec) {
+        delete dsbMaxAccDec;
+        dsbMaxAccDec = nullptr;
+    }
+    if (dsbMaxJerk) {
+        delete dsbMaxJerk;
+        dsbMaxJerk = nullptr;
+    }
+    if (pbLinear) {
+        delete pbLinear;
+        pbLinear = nullptr;
+    }
+    if (pbJoint) {
+        delete pbJoint;
+        pbJoint = nullptr;
+    }
+    if (gbGroup) {
+        delete gbGroup;
+        gbGroup = nullptr;
     }
 }
 

@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
    vBoxLayout->addWidget(this->pRobot->gbGroup);
    vBoxLayout->addWidget(this->pbKinematic);
    vBoxLayout->addWidget(this->pTcpClient->gbGroup);
-   vBoxLayout->addWidget(this->pTrajectory->gbPTP);
+   vBoxLayout->addWidget(this->pTrajectory->gbGroup);
 
    QWidget *windowMS = new QWidget();
    windowMS->setLayout(vBoxLayout);

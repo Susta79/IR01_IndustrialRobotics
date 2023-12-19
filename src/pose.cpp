@@ -5,49 +5,9 @@
 #include <QLabel>
 #include <Eigen/Dense>
 
-Pose::Pose(){
-    this->Init();
-}
+Pose::Pose(QString n, Affine3d m){
+    this->name = n;
 
-Pose::Pose(Affine3d m){
-    this->Init();
-    this->set_pose(m);
-}
-
-Pose::~Pose(){
-    if (dsbX) {
-        delete dsbX;
-        dsbX = nullptr;
-    }
-    if (dsbY) {
-        delete dsbY;
-        dsbY = nullptr;
-    }
-    if (dsbZ) {
-        delete dsbZ;
-        dsbZ = nullptr;
-    }
-    if (dsbA) {
-        delete dsbA;
-        dsbA = nullptr;
-    }
-    if (dsbB) {
-        delete dsbB;
-        dsbB = nullptr;
-    }
-    if (dsbC) {
-        delete dsbC;
-        dsbC = nullptr;
-    }
-    // Group
-    if (gbPose) {
-        delete gbPose;
-        gbPose = nullptr;
-    }
-}
-
-void Pose::Init(){
-    // Group Links
     this->dsbX = new QDoubleSpinBox;
     this->dsbX->setRange(-9999.0, 9999.0);
     this->dsbX->setSingleStep(1.0);
@@ -90,7 +50,9 @@ void Pose::Init(){
     this->dsbC->setValue(0.0);
     this->dsbC->setDecimals(3);
 
-    this->gbPose = new QGroupBox("Pose");
+    this->poseConf = new PoseConf();
+
+    this->gbGroup = new QGroupBox("Pose");
     QFormLayout *layoutJoints = new QFormLayout;
     layoutJoints->addRow(new QLabel("X:"), dsbX);
     layoutJoints->addRow(new QLabel("Y:"), dsbY);
@@ -98,20 +60,59 @@ void Pose::Init(){
     layoutJoints->addRow(new QLabel("A:"), dsbA);
     layoutJoints->addRow(new QLabel("B:"), dsbB);
     layoutJoints->addRow(new QLabel("C:"), dsbC);
-    this->gbPose->setLayout(layoutJoints);
+    layoutJoints->addRow(new QLabel("Cfg:"), poseConf->gbGroup);
+    this->gbGroup->setLayout(layoutJoints);
+
+    this->set_pose(m);
+}
+
+Pose::~Pose(){
+    if (dsbX) {
+        delete dsbX;
+        dsbX = nullptr;
+    }
+    if (dsbY) {
+        delete dsbY;
+        dsbY = nullptr;
+    }
+    if (dsbZ) {
+        delete dsbZ;
+        dsbZ = nullptr;
+    }
+    if (dsbA) {
+        delete dsbA;
+        dsbA = nullptr;
+    }
+    if (dsbB) {
+        delete dsbB;
+        dsbB = nullptr;
+    }
+    if (dsbC) {
+        delete dsbC;
+        dsbC = nullptr;
+    }
+    if (gbGroup) {
+        delete gbGroup;
+        gbGroup = nullptr;
+    }
+    if (poseConf) {
+        delete poseConf;
+        poseConf = nullptr;
+    }
 }
 
 // pose
 Affine3d Pose::get_pose(){
     Matrix3d rot;
-    Affine3d p = Eigen::Affine3d::Identity();
-    p.translation() = Eigen::Vector3d(this->dsbX->value(), this->dsbY->value(), this->dsbZ->value());
+    Affine3d p = Affine3d::Identity();
+    p.translation() = Vector3d(this->dsbX->value(), this->dsbY->value(), this->dsbZ->value());
     rot = AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitZ()) *
         AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY()) *
         AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitX());
     p.linear() = rot;
     return p;
 }
+
 void Pose::set_pose(Affine3d m){
     Vector3d t = m.translation();
     this->dsbX->setValue(t.x());
@@ -121,64 +122,4 @@ void Pose::set_pose(Affine3d m){
     this->dsbA->setValue(ea.z());
     this->dsbB->setValue(ea.y());
     this->dsbC->setValue(ea.x());
-}
-
-// x
-double Pose::get_x()
-{
-    return this->dsbX->value();
-}
-void Pose::set_x(double val)
-{
-    this->dsbX->setValue(val);
-}
-
-// y
-double Pose::get_y()
-{
-    return this->dsbY->value();
-}
-void Pose::set_y(double val)
-{
-    this->dsbY->setValue(val);
-}
-
-// z
-double Pose::get_z()
-{
-    return this->dsbZ->value();
-}
-void Pose::set_z(double val)
-{
-    this->dsbZ->setValue(val);
-}
-
-// a
-double Pose::get_a()
-{
-    return this->dsbA->value();
-}
-void Pose::set_a(double val)
-{
-    this->dsbA->setValue(val);
-}
-
-// b
-double Pose::get_b()
-{
-    return this->dsbB->value();
-}
-void Pose::set_b(double val)
-{
-    this->dsbB->setValue(val);
-}
-
-// c
-double Pose::get_c()
-{
-    return this->dsbC->value();
-}
-void Pose::set_c(double val)
-{
-    this->dsbC->setValue(val);
 }
