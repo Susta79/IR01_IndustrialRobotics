@@ -14,6 +14,7 @@
 #include <IR01/error_def.h>
 
 using Eigen::MatrixXd;
+//using std;
 
 Robot::Robot(QString n)
 {
@@ -21,8 +22,7 @@ Robot::Robot(QString n)
 
     this->pLink = new Link();
     this->pJoint = new Joint("Controller");
-    Affine3d pose = this->FK(pJoint->get_joints_rad());
-    this->pPose = new Pose(pose);
+    this->pPose = this->FK(pJoint->get_joints_rad());
 
     this->pbFK = new QPushButton("FK ->");
     this->pbIK = new QPushButton("<- IK");
@@ -63,7 +63,78 @@ Robot::~Robot(){
     }
 }
 
-Affine3d Robot::FK(Array<double, 6, 1> j){
+// Joint values in radiants
+//Affine3d Robot::FK(Array<double, 6, 1> j){
+//    double J1, J2, J3, J4, J5, J6;
+//    J1 = j(0);
+//    J2 = j(1);
+//    J3 = j(2);
+//    J4 = j(3);
+//    J5 = j(4);
+//    J6 = j(5);
+//
+//    // FK Step #1: from Frame 6 to Frame 5
+//    // Homogeneous transformation T_56
+//    // Joint 6
+//    // Translation
+//    Affine3d T_56t(Translation3d(Vector3d(this->pLink->get_a6x(), 0, 0)));
+//    // Rotation around X
+//    Affine3d T_56r(AngleAxisd(J6, Vector3d::UnitX()));
+//    Affine3d T_56 = T_56t * T_56r;
+//
+//    // FK Step #2: from Frame 5 to Frame 4
+//    // Homogeneous transformation T_45
+//    // Joint 5
+//    // Translation
+//    Affine3d T_45t(Translation3d(Vector3d(this->pLink->get_a5x(), 0, 0)));
+//    // Rotation around Y
+//    Affine3d T_45r(AngleAxisd(J5, Vector3d::UnitY()));
+//    Affine3d T_45 = T_45t * T_45r;
+//
+//    // FK Step #3: from Frame 4 to Frame 3
+//    // Homogeneous transformation T_34
+//    // Joint 4
+//    // Translation
+//    Affine3d T_34t(Translation3d(Vector3d(this->pLink->get_a4x(), 0, this->pLink->get_a4z())));
+//    // Rotation around X
+//    Affine3d T_34r(AngleAxisd(J4, Vector3d::UnitX()));
+//    Affine3d T_34 = T_34t * T_34r;
+//
+//    // FK Step #4: from Frame 3 to Frame 2
+//    // Homogeneous transformation T_23
+//    // Joint 3
+//    // Translation
+//    Affine3d T_23t(Translation3d(Vector3d(0, 0, this->pLink->get_a3z())));
+//    // Rotation around Y
+//    Affine3d T_23r(AngleAxisd(J3, Vector3d::UnitY()));
+//    Affine3d T_23 = T_23t * T_23r;
+//
+//    // FK Step #5: from Frame 2 to Frame 1
+//    // Homogeneous transformation T_12
+//    // Joint 2
+//    // Translation
+//    Affine3d T_12t(Translation3d(Vector3d(this->pLink->get_a2x(), 0, this->pLink->get_a2z())));
+//    // Rotation around Y
+//    Affine3d T_12r(AngleAxisd(J2, Vector3d::UnitY()));
+//    Affine3d T_12 = T_12t * T_12r;
+//
+//    // FK Step #6: from Frame 1 to Frame 0
+//    // Homogeneous transformation T_01
+//    // Joint 1
+//    // Translation
+//    Affine3d T_01t(Translation3d(Vector3d(0, 0, this->pLink->get_a1z())));
+//    // Rotation around Y
+//    Affine3d T_01r(AngleAxisd(J1, Vector3d::UnitZ()));
+//    Affine3d T_01 = T_01t * T_01r;
+//
+//    // Combined transformation: from Frame 6 to Frame 0
+//    Affine3d T_06 = T_01 * T_12 * T_23 * T_34 * T_45 * T_56;
+//
+//    return T_06;
+//}
+
+// Joint values in radiants
+Pose* Robot::FK(Array<double, 6, 1> j){
     double J1, J2, J3, J4, J5, J6;
     J1 = j(0);
     J2 = j(1);
@@ -129,7 +200,34 @@ Affine3d Robot::FK(Array<double, 6, 1> j){
     // Combined transformation: from Frame 6 to Frame 0
     Affine3d T_06 = T_01 * T_12 * T_23 * T_34 * T_45 * T_56;
 
-    return T_06;
+    // Determine configuration
+    string cfg;
+    Vector3d x_hat = T_06.rotation() * Vector3d::UnitX();
+    Vector3d WP = T_06.translation() - (this->pLink->get_a6x() * x_hat.normalized());
+
+    // Check if there is a shoulder singularity
+    if((abs(WP(0)) < 0.001) && (abs(WP(1)) < 0.001)){
+        // In this case we have a shoulder singularity.
+        // Fix configuration as Front
+        cfg="F";
+    }
+    else{
+        cfg="F";
+        double J1calc = atan2(WP(1), WP(0));
+        if (abs(J1calc-J1)>=M_PI_2) cfg="B";
+    }
+
+    if (J3>=-M_PI_2)
+        cfg += "U";
+    else
+        cfg += "D";
+
+    if (J5>=0)
+        cfg += "P";
+    else
+        cfg += "N";
+
+    return new Pose("", T_06, cfg);
 }
 
 ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
@@ -161,7 +259,7 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
         // FRONT solution
         J1 = atan2(WP(1), WP(0));
         // To have the BACK solution I need to add or substract pi
-        if(p->get_conf()->get_front_back() == 'B'){
+        if(p->is_conf_Back()){
             // BACK solution is selected
             if(J1 > 0)
                 J1 -= M_PI;
@@ -173,15 +271,12 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
     // Find J2 and J3
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
 
-    switch (p->get_conf()->get_front_back()){
-        case 'F':
-            // FRONT solution
-            l = WPxy - this->pLink->get_a2x();
-            break;
-        case 'B':
-            // BACK solution
-            l = WPxy + this->pLink->get_a2x();
-            break;
+    if(p->is_conf_Front()) {
+        // FRONT solution
+        l = WPxy - this->pLink->get_a2x();
+    } else {
+        // BACK solution
+        l = WPxy + this->pLink->get_a2x();
     }
     h = WP(2) - this->pLink->get_a1z() - this->pLink->get_a2z();
 
@@ -199,17 +294,15 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
     alpha = atan2(h, l);
     cos_beta = (pow(rho,2) + pow(this->pLink->get_a3z(),2) - pow(b4x,2)) / (2*rho*this->pLink->get_a3z());
     sin_beta = sqrt(1 - pow(cos_beta,2));
-    beta = atan2(sin_beta, cos_beta);
 
-    switch (p->get_conf()->get_up_down()){
-        case 'U':
-            // UP solution
-            J2 = M_PI_2 - alpha - beta;
-            break;
-        case 'D':
-            // DOWN solution
-            J2 = M_PI_2 - alpha + beta;
-            break;
+    if (p->is_conf_Up()) {
+        // UP solution
+        beta = atan2(sin_beta, cos_beta);
+        J2 = M_PI_2 - alpha - beta;
+    } else {
+        // DOWN solution
+        beta = atan2(-sin_beta, cos_beta);
+        J2 = alpha - beta - M_PI_2;
     }
 
     cos_gamma = (pow(this->pLink->get_a3z(),2) + pow(b4x,2) - pow(rho,2)) / (2*this->pLink->get_a3z()*b4x);
@@ -217,7 +310,14 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
     gamma = atan2(sin_gamma, cos_gamma);
     delta = atan2(this->pLink->get_a4x()+this->pLink->get_a5x(), this->pLink->get_a4z());
 
-    J3 = M_PI - gamma - delta;
+    
+    if (p->is_conf_Up()) {
+        // UP solution
+        J3 = M_PI - gamma - delta;
+    } else {
+        // DOWN solution
+        J3 = gamma - delta - M_PI;
+    }
 
     // Calculate Rarm from the values of J1, J2, J3
     pJ1 = AngleAxisd(J1, Vector3d::UnitZ());
@@ -237,19 +337,16 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
 
     if (Rwrist11 < 0.9999999) {
         if (Rwrist11 > -0.9999999) {
-            switch (p->get_conf()->get_pos_neg()){
-                case 'P':
-                    // Positive solution
-                    J5 = atan2( sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
-                    J4 = atan2(Rwrist21,-Rwrist31);
-                    J6 = atan2(Rwrist12,Rwrist13);
-                    break;
-                case 'N':
-                    // Negative solution
-                    J5 = atan2( -sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
-                    J4 = atan2(-Rwrist21,Rwrist31);
-                    J6 = atan2(-Rwrist12,-Rwrist13);
-                    break;
+            if (p->is_conf_Positive()) {
+                // Positive solution
+                J5 = atan2( sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
+                J4 = atan2(Rwrist21,-Rwrist31);
+                J6 = atan2(Rwrist12,Rwrist13);
+            } else {
+                // Negative solution
+                J5 = atan2( -sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
+                J4 = atan2(-Rwrist21,Rwrist31);
+                J6 = atan2(-Rwrist12,-Rwrist13);
             }
         }
         else // Rwrist11 = −1 
@@ -276,8 +373,11 @@ ARCCode_t Robot::IK(Pose* p, Array<double, 6, 1>& joint){
 }
 
 void Robot::pbFK_released(){
-  Affine3d pose = this->FK(this->pJoint->get_joints_rad());
-  pPose->set_pose(pose);
+    Pose* p = this->FK(this->pJoint->get_joints_rad());
+    Affine3d m = p->get_pose();
+    string cfg = p->get_conf();
+    delete p;
+    pPose->set_pose(m, cfg);
 }
 
 void Robot::pbIK_released(){

@@ -37,7 +37,8 @@ public:
 
     Robot(QString name);
     ~Robot();
-    Affine3d FK(Array<double, 6, 1>);
+    //Affine3d FK(Array<double, 6, 1>);
+    Pose* FK(Array<double, 6, 1>);
     ARCCode_t IK(Pose* p, Array<double, 6, 1>& joint);
 };
 

@@ -1,35 +1,34 @@
 #ifndef POSE_CONF_H
 #define POSE_CONF_H
 
+//#include <string.h>
 #include <QGroupBox>
 #include <QComboBox>
+
+using namespace std;
 
 class PoseConf
 {
 private:
-    QComboBox* cbFrontBack;
-    QComboBox* cbUpDown;
-    QComboBox* cbPosNeg;
+    QComboBox* cbPoseConf;
 
 public:
     QGroupBox *gbGroup;
 
-    PoseConf() { new (this) PoseConf('F', 'U', 'P'); }
-    PoseConf(char16_t fb, char16_t ud, char16_t pn);
+    PoseConf() { new (this) PoseConf("FUP"); }
+    PoseConf(string cfg);
     ~PoseConf();
 
-    // FrontBack
-    char16_t get_front_back() { return this->cbFrontBack->itemData(cbFrontBack->currentIndex()).toChar().unicode(); }
-    void set_front_back(char16_t c) { if ( cbFrontBack->findData(c) ) cbFrontBack->setCurrentIndex(cbFrontBack->findData(c)); }
+    // Conf
+    string get_conf() { return this->cbPoseConf->currentText().toStdString(); }
+    void set_conf(string cfg);
 
-    // UpDown
-    char16_t get_up_down() { return this->cbUpDown->itemData(cbUpDown->currentIndex()).toChar().unicode(); }
-    void set_up_down(char16_t c) { if ( cbUpDown->findData(c) ) cbUpDown->setCurrentIndex(cbUpDown->findData(c)); }
-
-    // PosNeg
-    char16_t get_pos_neg() { return this->cbPosNeg->itemData(cbPosNeg->currentIndex()).toChar().unicode(); }
-    void set_pos_neg(char16_t c) { if ( cbPosNeg->findData(c) ) cbPosNeg->setCurrentIndex(cbPosNeg->findData(c)); }
-
+    bool is_conf_Front()    { return (this->get_conf().find("F")!=string::npos); }
+    bool is_conf_Back()     { return (this->get_conf().find("B")!=string::npos); }
+    bool is_conf_Up()       { return (this->get_conf().find("U")!=string::npos); }
+    bool is_conf_Down()     { return (this->get_conf().find("D")!=string::npos); }
+    bool is_conf_Positive() { return (this->get_conf().find("P")!=string::npos); }
+    bool is_conf_Negative() { return (this->get_conf().find("N")!=string::npos); }
 };
 
 #endif // POSE_CONF_H

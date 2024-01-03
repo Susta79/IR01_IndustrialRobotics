@@ -2,46 +2,56 @@
 
 #include <QHBoxLayout>
 
-PoseConf::PoseConf(char16_t fb, char16_t ud, char16_t pn){
-    cbFrontBack = new QComboBox();
-    cbFrontBack->addItem("F",QChar('F'));
-    cbFrontBack->addItem("B",QChar('B'));
-
-    cbUpDown = new QComboBox();
-    cbUpDown->addItem("U",QChar('U'));
-    cbUpDown->addItem("D",QChar('D'));
-
-    cbPosNeg = new QComboBox();
-    cbPosNeg->addItem("P",QChar('P'));
-    cbPosNeg->addItem("N",QChar('N'));
+PoseConf::PoseConf(string cfg){
+    cbPoseConf = new QComboBox();
+    cbPoseConf->addItem("FUP",QChar('FUP'));
+    cbPoseConf->addItem("FUN",QChar('FUN'));
+    cbPoseConf->addItem("FDP",QChar('FDP'));
+    cbPoseConf->addItem("FDN",QChar('FDN'));
+    cbPoseConf->addItem("BUP",QChar('BUP'));
+    cbPoseConf->addItem("BUN",QChar('BUN'));
+    cbPoseConf->addItem("BDP",QChar('BDP'));
+    cbPoseConf->addItem("BDN",QChar('BDN'));
+    cbPoseConf->addItem("###",QChar('###'));
 
     this->gbGroup = new QGroupBox();
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
-    hBoxLayout->addWidget(cbFrontBack);
-    hBoxLayout->addWidget(cbUpDown);
-    hBoxLayout->addWidget(cbPosNeg);
+    hBoxLayout->addWidget(cbPoseConf);
     this->gbGroup->setLayout(hBoxLayout);
 
-    this->set_front_back(fb);
-    this->set_up_down(ud);
-    this->set_pos_neg(pn);
+    this->set_conf(cfg);
 }
 
 PoseConf::~PoseConf(){
-    if (cbFrontBack) {
-        delete cbFrontBack;
-        cbFrontBack = nullptr;
-    }
-    if (cbUpDown) {
-        delete cbUpDown;
-        cbUpDown = nullptr;
-    }
-    if (cbPosNeg) {
-        delete cbPosNeg;
-        cbPosNeg = nullptr;
+    if (cbPoseConf) {
+        delete cbPoseConf;
+        cbPoseConf = nullptr;
     }
     if (gbGroup) {
         delete gbGroup;
         gbGroup = nullptr;
     }
 }
+
+void PoseConf::set_conf(string cfg) {
+    int found = cbPoseConf->findText(QString::fromStdString(cfg));
+    if ( found>=0 ) cbPoseConf->setCurrentIndex( found );
+    // return;
+    if (cfg=="FUP")
+        cbPoseConf->setCurrentText(QString::fromStdString("FUP"));
+    else if (cfg=="FUN")
+        cbPoseConf->setCurrentText(QString::fromStdString("FUN"));
+    else if (cfg=="FDP")
+        cbPoseConf->setCurrentText(QString::fromStdString("FDP"));
+    else if (cfg=="FDN")
+        cbPoseConf->setCurrentText(QString::fromStdString("FDN"));
+    else if (cfg=="BUP")
+        cbPoseConf->setCurrentText(QString::fromStdString("BUP"));
+    else if (cfg=="BUN")
+        cbPoseConf->setCurrentText(QString::fromStdString("BUN"));
+    else if (cfg=="BDP")
+        cbPoseConf->setCurrentText(QString::fromStdString("BDP"));
+    else if (cfg=="BDN")
+        cbPoseConf->setCurrentText(QString::fromStdString("BDN"));
+}
+

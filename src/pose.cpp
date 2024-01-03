@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <Eigen/Dense>
 
-Pose::Pose(QString n, Affine3d m){
+Pose::Pose(QString n, Affine3d m, string cfg){
     this->name = n;
 
     this->dsbX = new QDoubleSpinBox;
@@ -50,7 +50,17 @@ Pose::Pose(QString n, Affine3d m){
     this->dsbC->setValue(0.0);
     this->dsbC->setDecimals(3);
 
-    this->poseConf = new PoseConf();
+    this->cbPoseConf = new QComboBox();
+    this->cbPoseConf->addItem("FUP",QChar('FUP'));
+    this->cbPoseConf->addItem("FUN",QChar('FUN'));
+    this->cbPoseConf->addItem("FDP",QChar('FDP'));
+    this->cbPoseConf->addItem("FDN",QChar('FDN'));
+    this->cbPoseConf->addItem("BUP",QChar('BUP'));
+    this->cbPoseConf->addItem("BUN",QChar('BUN'));
+    this->cbPoseConf->addItem("BDP",QChar('BDP'));
+    this->cbPoseConf->addItem("BDN",QChar('BDN'));
+    this->cbPoseConf->addItem("###",QChar('###'));
+    this->cbPoseConf->setCurrentIndex(0);
 
     this->gbGroup = new QGroupBox("Pose");
     QFormLayout *layoutJoints = new QFormLayout;
@@ -60,10 +70,11 @@ Pose::Pose(QString n, Affine3d m){
     layoutJoints->addRow(new QLabel("A:"), dsbA);
     layoutJoints->addRow(new QLabel("B:"), dsbB);
     layoutJoints->addRow(new QLabel("C:"), dsbC);
-    layoutJoints->addRow(new QLabel("Cfg:"), poseConf->gbGroup);
+    layoutJoints->addRow(new QLabel("Cfg:"), cbPoseConf);
     this->gbGroup->setLayout(layoutJoints);
 
     this->set_pose(m);
+    this->set_conf(cfg);
 }
 
 Pose::~Pose(){
@@ -91,13 +102,13 @@ Pose::~Pose(){
         delete dsbC;
         dsbC = nullptr;
     }
+    if (cbPoseConf) {
+        delete cbPoseConf;
+        cbPoseConf = nullptr;
+    }
     if (gbGroup) {
         delete gbGroup;
         gbGroup = nullptr;
-    }
-    if (poseConf) {
-        delete poseConf;
-        poseConf = nullptr;
     }
 }
 
@@ -113,7 +124,7 @@ Affine3d Pose::get_pose(){
     return p;
 }
 
-void Pose::set_pose(Affine3d m){
+void Pose::set_pose(Affine3d m, string cfg){
     Vector3d t = m.translation();
     this->dsbX->setValue(t.x());
     this->dsbY->setValue(t.y());
@@ -122,4 +133,28 @@ void Pose::set_pose(Affine3d m){
     this->dsbA->setValue(ea.z());
     this->dsbB->setValue(ea.y());
     this->dsbC->setValue(ea.x());
+
+    this->set_conf(cfg);
+}
+
+void Pose::set_conf(string cfg) {
+    int found = cbPoseConf->findText(QString::fromStdString(cfg));
+    if ( found>=0 ) cbPoseConf->setCurrentIndex( found );
+    // return;
+    //if (cfg=="FUP")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("FUP"));
+    //else if (cfg=="FUN")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("FUN"));
+    //else if (cfg=="FDP")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("FDP"));
+    //else if (cfg=="FDN")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("FDN"));
+    //else if (cfg=="BUP")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("BUP"));
+    //else if (cfg=="BUN")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("BUN"));
+    //else if (cfg=="BDP")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("BDP"));
+    //else if (cfg=="BDN")
+    //    cbPoseConf->setCurrentText(QString::fromStdString("BDN"));
 }

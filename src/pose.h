@@ -4,17 +4,18 @@
 #include <QWidget>
 #include <QGroupBox>
 #include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QRadioButton>
+//#include <QCheckBox>
+#include <QComboBox>
 
 #include <Eigen\Geometry>
 
-#include "pose_conf.h"
+//#include "pose_conf.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 using namespace Eigen;
+using namespace std;
 
 class Pose
 {
@@ -26,20 +27,22 @@ private:
     QDoubleSpinBox *dsbA;
     QDoubleSpinBox *dsbB;
     QDoubleSpinBox *dsbC;
-    PoseConf* poseConf;
+    QComboBox* cbPoseConf;
 
 public:
     QGroupBox *gbGroup;
 
-    Pose() { new (this) Pose("", Affine3d::Identity()); }
-    Pose(QString n) { new (this) Pose(n, Affine3d::Identity()); }
-    Pose(Affine3d m) { new (this) Pose("", m); }
-    Pose(QString name, Affine3d m);
+    Pose() { new (this) Pose("", Affine3d::Identity(), "FUP"); }
+    Pose(QString name) { new (this) Pose(name, Affine3d::Identity(), "FUP"); }
+    Pose(Affine3d m) { new (this) Pose("", m, "FUP"); }
+    Pose(Affine3d m, string cfg) { new (this) Pose("", m, cfg); }
+    Pose(QString name, Affine3d m, string cfg);
     ~Pose();
 
     // pose
     Affine3d get_pose();
-    void set_pose(Affine3d);
+    void set_pose(Affine3d m) { set_pose(m, "FUP"); };
+    void set_pose(Affine3d m, string cfg);
 
     // x
     double get_x() { return this->dsbX->value(); }
@@ -66,7 +69,30 @@ public:
     void set_c(double val) { this->dsbC->setValue(val); }
 
     // PoseConf
-    PoseConf* get_conf() { return this->poseConf;}
+    //PoseConf* get_pose_conf() { return this->poseConf; }
+    //void set_pose_conf(PoseConf* cfg) { if (poseConf) { delete poseConf; } this->poseConf=cfg; }
+//
+    //// Conf
+    //string get_conf() { return this->poseConf->get_conf(); }
+    //void set_conf(string cfg) { this->poseConf->set_conf(cfg); }
+//
+    //bool is_conf_Front() { return this->poseConf->is_conf_Front(); }
+    //bool is_conf_Back()  { return this->poseConf->is_conf_Back(); }
+    //bool is_conf_Up()    { return this->poseConf->is_conf_Up(); }
+    //bool is_conf_Down()  { return this->poseConf->is_conf_Down(); }
+    //bool is_conf_Positive()   { return this->poseConf->is_conf_Positive(); }
+    //bool is_conf_Negative()   { return this->poseConf->is_conf_Negative(); }
+
+    // Conf
+    string get_conf() { return this->cbPoseConf->currentText().toStdString(); }
+    void set_conf(string cfg);
+
+    bool is_conf_Front()    { return (this->get_conf().find("F")!=string::npos); }
+    bool is_conf_Back()     { return (this->get_conf().find("B")!=string::npos); }
+    bool is_conf_Up()       { return (this->get_conf().find("U")!=string::npos); }
+    bool is_conf_Down()     { return (this->get_conf().find("D")!=string::npos); }
+    bool is_conf_Positive() { return (this->get_conf().find("P")!=string::npos); }
+    bool is_conf_Negative() { return (this->get_conf().find("N")!=string::npos); }
 };
 
 #endif // POSE_H
