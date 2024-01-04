@@ -1,17 +1,25 @@
+using UnityEngine;
 using System;
+using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Transformations;
 
 public class EthSocketServer : MonoBehaviour
 {
     public Transform[] Robot = new Transform[6];
+    public Text[] txtJoint = new Text[6];
+	public Text[] txtTCP = new Text[6];
     System.Threading.Thread SocketThread;
     volatile bool keepReading = false;
     volatile double[] joints = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	private double[] TCP = new double[6];
+	private double[] Zero = new double[6];
 
     // Start is called before the first frame update
     void Start()
@@ -96,8 +104,7 @@ public class EthSocketServer : MonoBehaviour
                             bytesRec = handler.Receive(bytes);
                             Debug.Log("Received from Server. Bytes: " + bytesRec);
                         }
-                        if (bytesRec <= 0)
-                        {
+                        if (bytesRec <= 0) {
                             Debug.Log("bytesRec <= 0");
                             keepReading = false;
                             Debug.Log("handler.Connected: " + handler.Connected.ToString());
@@ -105,11 +112,13 @@ public class EthSocketServer : MonoBehaviour
                         } else {
                             Debug.Log("bytesRec > 0");
                             data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                            if (data.IndexOf("\n") > -1)
+                            int index = data.IndexOf("\n");
+                            if (index > -1)
                             {
                                 Debug.Log("Received: " + data);
                                 data = data.Replace('.', ',');
-                                String[] datas = data.Split(" ", StringSplitOptions.None);
+                                String[] datas = data.Split(' ');
+                                //String[] datas = data.Split(" ")
                                 Debug.Log("datas Length: " + datas.Length);
                                 if (datas.Length == 6) {
                                     double.TryParse(datas[0], out joints[0]);
@@ -129,21 +138,21 @@ public class EthSocketServer : MonoBehaviour
                             }
                             break;
                         }
-                        Debug.Log("1");
-                        System.Threading.Thread.Sleep(1);
+                        //Debug.Log("1");
+                        //System.Threading.Thread.Sleep(1);
                     }
                     Debug.Log("2");
-                    if (handler.Connected)
-                        handler.Disconnect(false);
+                    //if (handler.Connected)
+                    //    handler.Disconnect(false);
                     Debug.Log("9");
                     System.Threading.Thread.Sleep(1);
                 }
                 Debug.Log("3");
                 handler.Close();
                 Debug.Log("4");
-                listener.Bind(localEndPoint);
+                //listener.Bind(localEndPoint);
                 Debug.Log("5");
-                listener.Listen(10);
+                //listener.Listen(10);
 
                 System.Threading.Thread.Sleep(1);
             }
@@ -187,6 +196,13 @@ public class EthSocketServer : MonoBehaviour
         Robot [3].localEulerAngles = new Vector3 ((float)-joints[3],0,0);
         Robot [4].localEulerAngles = new Vector3 (0,0,(float)-joints[4]);
         Robot [5].localEulerAngles = new Vector3 ((float)-joints[5],0,0);
+        //call DK to update TCP
+        Arm.Direct (joints, Zero, ref TCP);
+        //update text labels
+        for (int i = 0; i < 6; i++) {
+            txtJoint [i].text = joints [i].ToString ("F1");
+            txtTCP [i].text = TCP [i].ToString ("F1");
+        }
     }
 }
 

@@ -28,7 +28,7 @@ private slots:
 
 private:
 
-    void Linear();
+    void Linear(Pose*, Pose*);
     void Joint();
 
 public:
